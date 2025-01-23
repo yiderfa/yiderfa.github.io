@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台北依德 依起過元宵 猜燈謎活動</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .welcome, .quiz, .result {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+        }
+
+        .welcome h1, .result h1 {
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.5;
+            color: black;
+        }
+
+        .welcome img, .result img {
+            max-width: 40%; /* 預設圖片寬度限制為容器的 40% */
+            height: auto; /* 高度自動調整 */
+            margin: 20px 0; /* 上下間距 */
+        }
+
+        @media (max-width: 1024px) {
+            .welcome img, .result img {
+                max-width: 60%; /* 平板上圖片寬度限制為容器的 60% */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome img, .result img {
+                max-width: 80%; /* 手機上圖片寬度限制為容器的 80% */
+            }
+        }
+
+        .welcome button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #6A0DAD;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .welcome button:hover {
+            background-color: #D8BFD8;
+        }
+
+        .quiz {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #6A0DAD;
+        }
+
+        .question {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .option {
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .yellow { background-color: #FFD700; }
+        .red { background-color: #FF4500; }
+        .blue { background-color: #1E90FF; }
+        .green { background-color: #32CD32; }
+
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            display: none;
+            animation: fade 2s ease-out;
+        }
+
+        @keyframes fade {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome">
+        <h1>台北依德<br>依起過元宵 猜燈謎活動</h1>
+        <img src="x1.jpg" alt="活動圖片">
+        <button onclick="startQuiz()">開始</button>
+    </div>
+
+    <div class="quiz">
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div class="result">
+        <h1>恭喜！您已成功完成挑戰！</h1>
+        <img src="753.jpg" alt="折價券圖片">
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        const questions = [
+            { text: "第一題：依據道路交通管理處罰條例，請問輪胎胎紋深度不得低於多少?", options: ["2.0MM", "2.6MM", "1.6MM", "3.0MM"], answer: 2 },
+            { text: "第二題：BMW 原廠認證輪胎，在胎壁會有什麼標示?", options: ["★", "◆", "●", "▲"], answer: 0 },
+            { text: "第三題：當「施壓續跑胎」因外力造成壓力下降(中釘、破胎)，下列作法何者正確?", options: ["趕快路邊停車，放警示牌聯絡拖車。", "加速行駛用最快的速度抵達服務中心。", "減速至80公里以內，小心駕駛前往鄰近服務中心。", "繼續正常行駛不用理會。"], answer: 2 },
+            { text: "第四題：下列哪些標示屬於「失壓續跑胎」?", options: ["RFT", "RSC", "RFH", "RSS"], answer: 1 },
+            { text: "第五題：為了行車安全考量，請問新胎要放前輪還是後輪?", options: ["要放前輪因為前輪轉向角度較大、磨損較快。", "要放後輪因為就算前輪爆胎，還可以透過方向盤控制方向。", "不放", "均可"], answer: 1 }
+        ];
+
+        let currentQuestion = 0;
+
+        function startQuiz() {
+            document.querySelector('.welcome').style.display = 'none';
+            document.querySelector('.quiz').style.display = 'flex';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const questionElement = document.getElementById('question');
+            const optionsElement = document.getElementById('options');
+            const question = questions[currentQuestion];
+
+            questionElement.textContent = question.text;
+            optionsElement.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.classList.add(["yellow", "red", "blue", "green"][index]);
+                optionElement.textContent = option;
+                optionElement.onclick = () => checkAnswer(index);
+                optionsElement.appendChild(optionElement);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const question = questions[currentQuestion];
+            if (selected === question.answer) {
+                showFeedback('正確！');
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    setTimeout(showQuestion, 2000);
+                } else {
+                    setTimeout(showResult, 2000);
+                }
+            } else {
+                showFeedback(`正確答案是：${question.options[question.answer]}`);
+            }
+        }
+
+        function showFeedback(message) {
+            const feedbackElement = document.getElementById('feedback');
+            feedbackElement.textContent = message;
+            feedbackElement.style.display = 'block';
+            setTimeout(() => feedbackElement.style.display = 'none', 2000);
+        }
+
+        function showResult() {
+            document.querySelector('.quiz').style.display = 'none';
+            document.querySelector('.result').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
